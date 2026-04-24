@@ -160,49 +160,181 @@ const PropertyPanel = () => {
         {isContainer && (
           <div className="property-panel__section">
             <h3 className="property-panel__section-title">Layout</h3>
+            
+            {/* Layout Type Selector */}
             <div className="property-panel__field">
-              <label className="property-panel__label">Direction</label>
+              <label className="property-panel__label">Layout Type</label>
               <div className="property-panel__button-group">
                 <button 
-                  className={`property-panel__toggle-btn ${styles.flexDirection === 'column' ? 'property-panel__toggle-btn--active' : ''}`}
-                  onClick={() => handleStyleChange('flexDirection', 'column')}
+                  className={`property-panel__toggle-btn ${styles.display === 'flex' ? 'property-panel__toggle-btn--active' : ''}`}
+                  onClick={() => handleStyleChange('display', 'flex')}
                 >
-                  ↓ Vertical
+                  Flex
                 </button>
                 <button 
-                  className={`property-panel__toggle-btn ${styles.flexDirection === 'row' ? 'property-panel__toggle-btn--active' : ''}`}
-                  onClick={() => handleStyleChange('flexDirection', 'row')}
+                  className={`property-panel__toggle-btn ${styles.display === 'grid' ? 'property-panel__toggle-btn--active' : ''}`}
+                  onClick={() => handleStyleChange('display', 'grid')}
                 >
-                  → Horizontal
+                  Grid
                 </button>
               </div>
             </div>
-            <div className="property-panel__field">
-              <label className="property-panel__label">Gap</label>
-              <div className="property-panel__input-with-unit">
-                <input 
-                  type="number" 
-                  className="property-panel__input" 
-                  value={parsePixelValue(styles.gap)}
-                  onChange={(e) => handleStyleChange('gap', `${e.target.value}px`)}
-                  min={0}
-                />
-                <span className="property-panel__unit">px</span>
-              </div>
-            </div>
-            <div className="property-panel__field">
-              <label className="property-panel__label">Align Items</label>
-              <select 
-                className="property-panel__select"
-                value={styles.alignItems || 'flex-start'}
-                onChange={(e) => handleStyleChange('alignItems', e.target.value as ElementStyles['alignItems'])}
-              >
-                <option value="flex-start">Start</option>
-                <option value="center">Center</option>
-                <option value="flex-end">End</option>
-                <option value="stretch">Stretch</option>
-              </select>
-            </div>
+
+            {/* Flexbox Properties */}
+            {styles.display === 'flex' && (
+              <>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Direction</label>
+                  <div className="property-panel__button-group">
+                    <button 
+                      className={`property-panel__toggle-btn ${styles.flexDirection === 'column' ? 'property-panel__toggle-btn--active' : ''}`}
+                      onClick={() => handleStyleChange('flexDirection', 'column')}
+                    >
+                      ↓ Vertical
+                    </button>
+                    <button 
+                      className={`property-panel__toggle-btn ${styles.flexDirection === 'row' ? 'property-panel__toggle-btn--active' : ''}`}
+                      onClick={() => handleStyleChange('flexDirection', 'row')}
+                    >
+                      → Horizontal
+                    </button>
+                  </div>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Justify Content</label>
+                  <select 
+                    className="property-panel__select"
+                    value={styles.justifyContent || 'flex-start'}
+                    onChange={(e) => handleStyleChange('justifyContent', e.target.value as ElementStyles['justifyContent'])}
+                  >
+                    <option value="flex-start">Start</option>
+                    <option value="center">Center</option>
+                    <option value="flex-end">End</option>
+                    <option value="space-between">Space Between</option>
+                    <option value="space-around">Space Around</option>
+                    <option value="space-evenly">Space Evenly</option>
+                  </select>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Align Items</label>
+                  <select 
+                    className="property-panel__select"
+                    value={styles.alignItems || 'flex-start'}
+                    onChange={(e) => handleStyleChange('alignItems', e.target.value as ElementStyles['alignItems'])}
+                  >
+                    <option value="flex-start">Start</option>
+                    <option value="center">Center</option>
+                    <option value="flex-end">End</option>
+                    <option value="stretch">Stretch</option>
+                    <option value="baseline">Baseline</option>
+                  </select>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Flex Wrap</label>
+                  <select 
+                    className="property-panel__select"
+                    value={styles.flexWrap || 'nowrap'}
+                    onChange={(e) => handleStyleChange('flexWrap', e.target.value as ElementStyles['flexWrap'])}
+                  >
+                    <option value="nowrap">No Wrap</option>
+                    <option value="wrap">Wrap</option>
+                    <option value="wrap-reverse">Wrap Reverse</option>
+                  </select>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Gap</label>
+                  <div className="property-panel__input-with-unit">
+                    <input 
+                      type="number" 
+                      className="property-panel__input" 
+                      value={parsePixelValue(styles.gap)}
+                      onChange={(e) => handleStyleChange('gap', `${e.target.value}px`)}
+                      min={0}
+                    />
+                    <span className="property-panel__unit">px</span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Grid Properties */}
+            {styles.display === 'grid' && (
+              <>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Columns</label>
+                  <input 
+                    type="text" 
+                    className="property-panel__input" 
+                    placeholder="e.g., 1fr 1fr or repeat(3, 1fr)"
+                    value={styles.gridTemplateColumns || ''}
+                    onChange={(e) => handleStyleChange('gridTemplateColumns', e.target.value)}
+                  />
+                  <div className="property-panel__hint">Examples: 1fr 1fr, repeat(3, 1fr), 200px auto</div>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Rows</label>
+                  <input 
+                    type="text" 
+                    className="property-panel__input" 
+                    placeholder="e.g., auto or 100px 200px"
+                    value={styles.gridTemplateRows || ''}
+                    onChange={(e) => handleStyleChange('gridTemplateRows', e.target.value)}
+                  />
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Column Gap</label>
+                  <div className="property-panel__input-with-unit">
+                    <input 
+                      type="number" 
+                      className="property-panel__input" 
+                      value={parsePixelValue(styles.gridColumnGap || styles.gap)}
+                      onChange={(e) => handleStyleChange('gridColumnGap', `${e.target.value}px`)}
+                      min={0}
+                    />
+                    <span className="property-panel__unit">px</span>
+                  </div>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Row Gap</label>
+                  <div className="property-panel__input-with-unit">
+                    <input 
+                      type="number" 
+                      className="property-panel__input" 
+                      value={parsePixelValue(styles.gridRowGap || styles.gap)}
+                      onChange={(e) => handleStyleChange('gridRowGap', `${e.target.value}px`)}
+                      min={0}
+                    />
+                    <span className="property-panel__unit">px</span>
+                  </div>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Justify Items</label>
+                  <select 
+                    className="property-panel__select"
+                    value={styles.justifyItems || 'stretch'}
+                    onChange={(e) => handleStyleChange('justifyItems', e.target.value as ElementStyles['justifyItems'])}
+                  >
+                    <option value="start">Start</option>
+                    <option value="center">Center</option>
+                    <option value="end">End</option>
+                    <option value="stretch">Stretch</option>
+                  </select>
+                </div>
+                <div className="property-panel__field">
+                  <label className="property-panel__label">Align Items</label>
+                  <select 
+                    className="property-panel__select"
+                    value={styles.alignItems || 'stretch'}
+                    onChange={(e) => handleStyleChange('alignItems', e.target.value as ElementStyles['alignItems'])}
+                  >
+                    <option value="flex-start">Start</option>
+                    <option value="center">Center</option>
+                    <option value="flex-end">End</option>
+                    <option value="stretch">Stretch</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
         )}
 

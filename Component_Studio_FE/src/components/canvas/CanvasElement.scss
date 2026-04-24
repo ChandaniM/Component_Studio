@@ -4,6 +4,7 @@
   transition: box-shadow 0.15s ease, outline 0.15s ease;
   cursor: pointer;
   box-sizing: border-box;
+  overflow: visible;
 
   // Selection state
   &--selected {
@@ -59,9 +60,7 @@
 
   // Input element
   &__input {
-    width: 100%;
     outline: none;
-    box-sizing: border-box;
     cursor: pointer;
     pointer-events: none;
 
@@ -84,6 +83,7 @@
     margin: 0;
     cursor: text;
     pointer-events: none;
+    display: block;
   }
 
   // Image element
@@ -115,6 +115,8 @@
   &--div,
   &--container,
   &--stack {
+    overflow: visible; // Allow selection outline to be visible
+    
     .canvas-element__drop-hint {
       margin: 4px 0;
     }
@@ -125,6 +127,12 @@
         background: rgba(59, 130, 246, 0.1);
         color: #3b82f6;
       }
+    }
+
+    // Ensure children stay within bounds
+    > * {
+      max-width: 100%;
+      box-sizing: border-box;
     }
   }
 
@@ -149,9 +157,19 @@
 
   // Dragging state
   &--dragging {
-    cursor: move;
-    opacity: 0.9;
+    cursor: grab;
+    opacity: 0.5;
     z-index: 100;
+    outline: 2px dashed #3b82f6 !important;
+  }
+
+  // Make elements look draggable on hover
+  &:hover {
+    cursor: grab;
+  }
+
+  &:active {
+    cursor: grabbing;
   }
 
   // Resizing state
@@ -254,5 +272,45 @@
       left: -3px;
       cursor: ew-resize;
     }
+  }
+
+  // Drop position indicators for drag-to-reorder
+  &--drop-before {
+    &::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #3b82f6;
+      border-radius: 2px;
+      z-index: 50;
+      animation: dropIndicatorPulse 0.8s ease-in-out infinite;
+    }
+  }
+
+  &--drop-after {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #3b82f6;
+      border-radius: 2px;
+      z-index: 50;
+      animation: dropIndicatorPulse 0.8s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes dropIndicatorPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }

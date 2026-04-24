@@ -71,18 +71,26 @@ const generateInlineStyles = (styles: Partial<ElementStyles>, elementType: Eleme
   
   // Layout
   if (styles.display) cssProperties.push(`display: ${styles.display}`);
-  if (styles.flexDirection && styles.display === 'flex') {
-    cssProperties.push(`flex-direction: ${styles.flexDirection}`);
+  
+  // Flexbox properties
+  if (styles.display === 'flex') {
+    if (styles.flexDirection) cssProperties.push(`flex-direction: ${styles.flexDirection}`);
+    if (styles.justifyContent) cssProperties.push(`justify-content: ${styles.justifyContent}`);
+    if (styles.alignItems) cssProperties.push(`align-items: ${styles.alignItems}`);
+    if (styles.flexWrap) cssProperties.push(`flex-wrap: ${styles.flexWrap}`);
   }
-  if (styles.justifyContent && styles.display === 'flex') {
-    cssProperties.push(`justify-content: ${styles.justifyContent}`);
+  
+  // Grid properties
+  if (styles.display === 'grid') {
+    if (styles.gridTemplateColumns) cssProperties.push(`grid-template-columns: ${styles.gridTemplateColumns}`);
+    if (styles.gridTemplateRows) cssProperties.push(`grid-template-rows: ${styles.gridTemplateRows}`);
+    if (styles.gridColumnGap) cssProperties.push(`column-gap: ${styles.gridColumnGap}`);
+    if (styles.gridRowGap) cssProperties.push(`row-gap: ${styles.gridRowGap}`);
+    if (styles.justifyItems) cssProperties.push(`justify-items: ${styles.justifyItems}`);
+    if (styles.alignItems) cssProperties.push(`align-items: ${styles.alignItems}`);
+    if (styles.alignContent) cssProperties.push(`align-content: ${styles.alignContent}`);
   }
-  if (styles.alignItems && styles.display === 'flex') {
-    cssProperties.push(`align-items: ${styles.alignItems}`);
-  }
-  if (styles.flexWrap && styles.display === 'flex') {
-    cssProperties.push(`flex-wrap: ${styles.flexWrap}`);
-  }
+  
   if (styles.gap) addProperty('gap', styles.gap);
   
   // Sizing

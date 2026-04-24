@@ -30,6 +30,15 @@ export interface ElementStyles {
   alignItems: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
   flexWrap: 'nowrap' | 'wrap' | 'wrap-reverse';
   
+  // Grid specific
+  gridTemplateColumns: string;
+  gridTemplateRows: string;
+  gridGap: string;
+  gridColumnGap: string;
+  gridRowGap: string;
+  justifyItems: 'start' | 'end' | 'center' | 'stretch';
+  alignContent: 'start' | 'end' | 'center' | 'stretch' | 'space-between' | 'space-around' | 'space-evenly';
+  
   // Sizing
   width: string;
   height: string;

@@ -16,6 +16,8 @@ interface CanvasContextType extends CanvasState {
   addElement: (type: ElementType, parentId?: string | null, index?: number) => CanvasElement;
   removeElement: (elementId: string) => void;
   moveElement: (elementId: string, newParentId: string | null, index?: number) => void;
+  moveElementUp: (elementId: string) => void;
+  moveElementDown: (elementId: string) => void;
   duplicateElement: (elementId: string) => void;
   
   // Selection
@@ -35,6 +37,7 @@ interface CanvasContextType extends CanvasState {
   // Utility
   getElementById: (elementId: string) => CanvasElement | null;
   getSelectedElement: () => CanvasElement | null;
+  getRootElementId: (elementId: string) => string;
   clearCanvas: () => void;
 }
 
@@ -189,6 +192,65 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
     });
   }, [findElement, removeElementFromTree, addElementToParent]);
 
+  // Helper: Reorder element within its parent
+  const reorderElement = useCallback((elementId: string, direction: 'up' | 'down') => {
+    setElements(prev => {
+      const element = findElement(prev, elementId);
+      if (!element) return prev;
+
+      // Get parent's children array
+      const getParentChildren = (elements: CanvasElement[], parentId: string | null): CanvasElement[] => {
+        if (parentId === null) return elements;
+        const parent = findElement(elements, parentId);
+        return parent ? parent.children : [];
+      };
+
+      const siblings = getParentChildren(prev, element.parentId);
+      const currentIndex = siblings.findIndex(el => el.id === elementId);
+      
+      if (currentIndex === -1) return prev;
+      
+      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      
+      // Check bounds
+      if (newIndex < 0 || newIndex >= siblings.length) return prev;
+
+      // Swap elements
+      const updateChildrenOrder = (elements: CanvasElement[], parentId: string | null): CanvasElement[] => {
+        if (parentId === null) {
+          // Reorder root level elements
+          const newElements = [...elements];
+          [newElements[currentIndex], newElements[newIndex]] = [newElements[newIndex], newElements[currentIndex]];
+          return newElements;
+        }
+        
+        return elements.map(el => {
+          if (el.id === parentId) {
+            const newChildren = [...el.children];
+            [newChildren[currentIndex], newChildren[newIndex]] = [newChildren[newIndex], newChildren[currentIndex]];
+            return { ...el, children: newChildren };
+          }
+          if (el.children.length > 0) {
+            return { ...el, children: updateChildrenOrder(el.children, parentId) };
+          }
+          return el;
+        });
+      };
+
+      return updateChildrenOrder(prev, element.parentId);
+    });
+  }, [findElement]);
+
+  // Move element up in its parent's order
+  const moveElementUp = useCallback((elementId: string) => {
+    reorderElement(elementId, 'up');
+  }, [reorderElement]);
+
+  // Move element down in its parent's order
+  const moveElementDown = useCallback((elementId: string) => {
+    reorderElement(elementId, 'down');
+  }, [reorderElement]);
+
   // Duplicate element
   const duplicateElement = useCallback((elementId: string) => {
     const element = findElement(elements, elementId);
@@ -287,6 +349,18 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
     return findElement(elements, selectedElementId);
   }, [elements, selectedElementId, findElement]);
 
+  // Get root element ID (finds the top-level parent)
+  const getRootElementId = useCallback((elementId: string): string => {
+    const element = findElement(elements, elementId);
+    if (!element) return elementId;
+    
+    // If element has no parent, it's already the root
+    if (element.parentId === null) return elementId;
+    
+    // Recursively find the root parent
+    return getRootElementId(element.parentId);
+  }, [elements, findElement]);
+
   // Clear canvas
   const clearCanvas = useCallback(() => {
     setElements([]);
@@ -303,6 +377,8 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
     addElement,
     removeElement,
     moveElement,
+    moveElementUp,
+    moveElementDown,
     duplicateElement,
     selectElement,
     setHoveredElement,
@@ -314,6 +390,7 @@ export const CanvasProvider = ({ children }: CanvasProviderProps) => {
     pasteElement,
     getElementById,
     getSelectedElement,
+    getRootElementId,
     clearCanvas,
   };
 

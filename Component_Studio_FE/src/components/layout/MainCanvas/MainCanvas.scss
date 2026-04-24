@@ -137,6 +137,8 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    overflow: auto;
+    position: relative;
 
     &--drag-over {
       outline: 3px dashed #3b82f6;
