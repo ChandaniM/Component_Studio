@@ -1,3 +1,5 @@
+import { DragEvent } from 'react';
+import type { ElementType } from '../../../types/canvas.types';
 import './Sidebar.scss';
 
 interface SidebarProps {
@@ -8,15 +10,55 @@ interface SidebarItem {
   id: string;
   icon: string;
   label: string;
-  type: 'card' | 'text' | 'image' | 'button';
+  type: ElementType;
+  description: string;
 }
 
-const componentPalette: SidebarItem[] = [
-  { id: 'card', icon: '▢', label: 'Card', type: 'card' },
-  { id: 'text', icon: 'T', label: 'Text', type: 'text' },
-  { id: 'image', icon: '🖼', label: 'Image', type: 'image' },
-  { id: 'button', icon: '⬚', label: 'Button', type: 'button' },
+const basicComponents: SidebarItem[] = [
+  { id: 'input', icon: '⎕', label: 'Input', type: 'input', description: 'Text input field' },
+  { id: 'button', icon: '▣', label: 'Button', type: 'button', description: 'Clickable button' },
+  { id: 'text', icon: 'T', label: 'Text', type: 'text', description: 'Text paragraph' },
+  { id: 'image', icon: '🖼', label: 'Image', type: 'image', description: 'Image placeholder' },
 ];
+
+const layoutComponents: SidebarItem[] = [
+  { id: 'div', icon: '▢', label: 'Div', type: 'div', description: 'Flexible container' },
+  { id: 'container', icon: '⊞', label: 'Container', type: 'container', description: 'Card-like container' },
+  { id: 'stack', icon: '☰', label: 'Stack', type: 'stack', description: 'Vertical stack layout' },
+];
+
+// Draggable component item
+const DraggableComponent = ({ item }: { item: SidebarItem }) => {
+  const handleDragStart = (e: DragEvent<HTMLDivElement>) => {
+    const dragData = {
+      type: item.type,
+      isNew: true,
+    };
+    e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+    e.dataTransfer.effectAllowed = 'copy';
+    
+    // Add drag styling
+    const target = e.currentTarget;
+    target.classList.add('sidebar__component--dragging');
+  };
+
+  const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
+    e.currentTarget.classList.remove('sidebar__component--dragging');
+  };
+
+  return (
+    <div
+      className="sidebar__component"
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      title={item.description}
+    >
+      <span className="sidebar__component-icon">{item.icon}</span>
+      <span className="sidebar__component-label">{item.label}</span>
+    </div>
+  );
+};
 
 const Sidebar = ({ mode }: SidebarProps) => {
   // Landing page - minimal sidebar
@@ -47,7 +89,7 @@ const Sidebar = ({ mode }: SidebarProps) => {
     );
   }
 
-  // Manual Builder - Component palette
+  // Manual Builder - Component palette with drag support
   if (mode === 'manual') {
     return (
       <aside className="sidebar">
@@ -58,36 +100,37 @@ const Sidebar = ({ mode }: SidebarProps) => {
 
         <div className="sidebar__content">
           <div className="sidebar__section">
-            <h3 className="sidebar__section-title">Basic</h3>
+            <h3 className="sidebar__section-title">Layout</h3>
             <div className="sidebar__components">
-              {componentPalette.map((item) => (
-                <div key={item.id} className="sidebar__component" draggable>
-                  <span className="sidebar__component-icon">{item.icon}</span>
-                  <span className="sidebar__component-label">{item.label}</span>
-                </div>
+              {layoutComponents.map((item) => (
+                <DraggableComponent key={item.id} item={item} />
               ))}
             </div>
           </div>
 
           <div className="sidebar__section">
-            <h3 className="sidebar__section-title">Layout</h3>
+            <h3 className="sidebar__section-title">Form Elements</h3>
             <div className="sidebar__components">
-              <div className="sidebar__component" draggable>
-                <span className="sidebar__component-icon">⊞</span>
-                <span className="sidebar__component-label">Container</span>
-              </div>
-              <div className="sidebar__component" draggable>
-                <span className="sidebar__component-icon">☰</span>
-                <span className="sidebar__component-label">Stack</span>
-              </div>
+              {basicComponents.filter(c => c.type === 'input' || c.type === 'button').map((item) => (
+                <DraggableComponent key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+
+          <div className="sidebar__section">
+            <h3 className="sidebar__section-title">Content</h3>
+            <div className="sidebar__components">
+              {basicComponents.filter(c => c.type === 'text' || c.type === 'image').map((item) => (
+                <DraggableComponent key={item.id} item={item} />
+              ))}
             </div>
           </div>
         </div>
 
         <div className="sidebar__footer">
-          <div className="sidebar__help">
-            <span className="sidebar__help-icon">?</span>
-            <span className="sidebar__help-text">Need help?</span>
+          <div className="sidebar__tip">
+            <span className="sidebar__tip-icon">💡</span>
+            <span className="sidebar__tip-text">Drag elements onto the canvas or into containers</span>
           </div>
         </div>
       </aside>

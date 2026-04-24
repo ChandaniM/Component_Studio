@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useState, DragEvent } from 'react';
+import { useCanvas } from '../../../store/canvasStore';
+import { CanvasElement } from '../../canvas';
+import type { ElementType } from '../../../types/canvas.types';
 import './MainCanvas.scss';
 
 interface MainCanvasProps {
@@ -24,6 +27,9 @@ interface GuidedFormData {
 }
 
 const MainCanvas = ({ mode, onModeChange }: MainCanvasProps) => {
+  // All hooks must be called unconditionally at the top
+  const { elements, addElement, selectElement, selectedElementId, setDragOverElement, clearCanvas } = useCanvas();
+  const [isDragOver, setIsDragOver] = useState(false);
   const [guidedStep, setGuidedStep] = useState(1);
   const [formData, setFormData] = useState<GuidedFormData>({
     componentType: 'card',
@@ -395,6 +401,49 @@ const MainCanvas = ({ mode, onModeChange }: MainCanvasProps) => {
   }
 
   // Manual Builder - Drag & Drop Canvas
+  const handleDragOver = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: DragEvent) => {
+    e.stopPropagation();
+    // Only set to false if we're leaving the artboard entirely
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (!e.currentTarget.contains(relatedTarget)) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    setDragOverElement(null);
+
+    const data = e.dataTransfer.getData('application/json');
+    if (!data) return;
+
+    try {
+      const dragData = JSON.parse(data);
+      
+      if (dragData.isNew) {
+        // Adding new element to root level
+        addElement(dragData.type as ElementType, null);
+      }
+    } catch (err) {
+      console.error('Drop error:', err);
+    }
+  };
+
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    // Deselect when clicking on empty canvas area
+    if (e.target === e.currentTarget) {
+      selectElement(null);
+    }
+  };
+
   return (
     <main className="main-canvas">
       <div className="main-canvas__toolbar">
@@ -412,17 +461,36 @@ const MainCanvas = ({ mode, onModeChange }: MainCanvasProps) => {
           </button>
           <button className="main-canvas__device-btn">📱</button>
         </div>
+        {elements.length > 0 && (
+          <button className="main-canvas__clear-btn" onClick={clearCanvas}>
+            Clear Canvas
+          </button>
+        )}
       </div>
 
       <div className="main-canvas__workspace">
-        <div className="main-canvas__artboard">
-          <div className="main-canvas__empty">
-            <div className="main-canvas__empty-icon">◇</div>
-            <h3 className="main-canvas__empty-title">Start Building</h3>
-            <p className="main-canvas__empty-text">
-              Drag components from the sidebar to start creating your UI
-            </p>
-          </div>
+        <div 
+          className={`main-canvas__artboard ${isDragOver ? 'main-canvas__artboard--drag-over' : ''} ${elements.length > 0 ? 'main-canvas__artboard--has-elements' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={handleCanvasClick}
+        >
+          {elements.length === 0 ? (
+            <div className="main-canvas__empty">
+              <div className="main-canvas__empty-icon">◇</div>
+              <h3 className="main-canvas__empty-title">Start Building</h3>
+              <p className="main-canvas__empty-text">
+                Drag components from the sidebar to start creating your UI
+              </p>
+            </div>
+          ) : (
+            <div className="main-canvas__elements" onClick={handleCanvasClick}>
+              {elements.map((element) => (
+                <CanvasElement key={element.id} element={element} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </main>
