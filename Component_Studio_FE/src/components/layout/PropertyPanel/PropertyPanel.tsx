@@ -469,6 +469,58 @@ const PropertyPanel = () => {
             </div>
           </div>
         </div>
+
+        {/* Position */}
+        <div className="property-panel__section">
+          <h3 className="property-panel__section-title">Position</h3>
+          <div className="property-panel__field">
+            <label className="property-panel__label">Position Type</label>
+            <select 
+              className="property-panel__select"
+              value={styles.position || 'relative'}
+              onChange={(e) => handleStyleChange('position', e.target.value as ElementStyles['position'])}
+            >
+              <option value="static">Static</option>
+              <option value="relative">Relative</option>
+              <option value="absolute">Absolute</option>
+            </select>
+          </div>
+          <div className="property-panel__row">
+            <div className="property-panel__field property-panel__field--half">
+              <label className="property-panel__label">Top</label>
+              <div className="property-panel__input-with-unit">
+                <input 
+                  type="number" 
+                  className="property-panel__input" 
+                  value={parsePixelValue(styles.top)}
+                  onChange={(e) => handleStyleChange('top', `${e.target.value}px`)}
+                />
+                <span className="property-panel__unit">px</span>
+              </div>
+            </div>
+            <div className="property-panel__field property-panel__field--half">
+              <label className="property-panel__label">Left</label>
+              <div className="property-panel__input-with-unit">
+                <input 
+                  type="number" 
+                  className="property-panel__input" 
+                  value={parsePixelValue(styles.left)}
+                  onChange={(e) => handleStyleChange('left', `${e.target.value}px`)}
+                />
+                <span className="property-panel__unit">px</span>
+              </div>
+            </div>
+          </div>
+          <button 
+            className="property-panel__reset-btn"
+            onClick={() => {
+              handleStyleChange('top', '0px');
+              handleStyleChange('left', '0px');
+            }}
+          >
+            Reset Position
+          </button>
+        </div>
       </div>
     </aside>
   );

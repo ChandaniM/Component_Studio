@@ -146,4 +146,113 @@
       background: #f97316;
     }
   }
+
+  // Dragging state
+  &--dragging {
+    cursor: move;
+    opacity: 0.9;
+    z-index: 100;
+  }
+
+  // Resizing state
+  &--resizing {
+    z-index: 100;
+  }
+
+  // Resize handles container
+  &__resize-handles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  // Individual resize handles
+  &__resize-handle {
+    position: absolute;
+    background: #3b82f6;
+    border: 2px solid #ffffff;
+    border-radius: 2px;
+    pointer-events: auto;
+    z-index: 30;
+    transition: transform 0.1s ease;
+
+    &:hover {
+      transform: scale(1.2);
+      background: #2563eb;
+    }
+
+    // Corner handles
+    &--nw, &--ne, &--sw, &--se {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    &--nw {
+      top: -5px;
+      left: -5px;
+      cursor: nwse-resize;
+    }
+
+    &--ne {
+      top: -5px;
+      right: -5px;
+      cursor: nesw-resize;
+    }
+
+    &--sw {
+      bottom: -5px;
+      left: -5px;
+      cursor: nesw-resize;
+    }
+
+    &--se {
+      bottom: -5px;
+      right: -5px;
+      cursor: nwse-resize;
+    }
+
+    // Edge handles
+    &--n, &--s {
+      width: 20px;
+      height: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      &:hover {
+        transform: translateX(-50%) scale(1.2);
+      }
+    }
+
+    &--n {
+      top: -3px;
+      cursor: ns-resize;
+    }
+
+    &--s {
+      bottom: -3px;
+      cursor: ns-resize;
+    }
+
+    &--e, &--w {
+      width: 6px;
+      height: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+
+      &:hover {
+        transform: translateY(-50%) scale(1.2);
+      }
+    }
+
+    &--e {
+      right: -3px;
+      cursor: ew-resize;
+    }
+
+    &--w {
+      left: -3px;
+      cursor: ew-resize;
+    }
+  }
 }

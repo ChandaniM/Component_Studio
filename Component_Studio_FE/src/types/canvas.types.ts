@@ -53,6 +53,11 @@ export interface ElementStyles {
   fontWeight: string;
   textAlign: 'left' | 'center' | 'right' | 'justify';
   lineHeight: string;
+  
+  // Position
+  position: 'static' | 'relative' | 'absolute';
+  top: string;
+  left: string;
 }
 
 export interface ElementProps {
@@ -105,6 +110,9 @@ export const DEFAULT_STYLES: Partial<ElementStyles> = {
   borderWidth: '0px',
   borderStyle: 'none',
   borderRadius: '0px',
+  position: 'relative',
+  top: '0px',
+  left: '0px',
 };
 
 export const ELEMENT_DEFAULTS: Record<ElementType, { styles: Partial<ElementStyles>; props: ElementProps }> = {
